@@ -20,7 +20,26 @@ export default {
 	src: url('/static/uni.ttf');
 }
 /* #endif */
-element{
+view{
+	box-sizing: border-box;
+	font-size: 32rpx;
+	color: #333333;
+}
+button{
+	background: none;
+	padding: 0;
+	font-weight: normal;
+	font-size: 32rpx;
 	box-sizing: border-box;
 }
+button::after{
+	border:0;
+}
+.wxParse.p{
+	margin: 0 !important;
+}
+.wxParse.img{
+	display: block !important;
+}
+
 </style>

@@ -1,7 +1,7 @@
 <template>
 	<view class="index">
 		<view class="search">
-			<navigator open-type="navigate" class="location" url="/pages/mappage" @tap="toMapPage">{{cityName}}</navigator>
+			<navigator open-type="navigate" class="location" url="/pages/mappage" @tap="toMapPage">{{locationName}}</navigator>
 			<view class="inputWrapper">
 				<label></label>
 				<input class="searchBar" type="text" placeholder="搜索商品" />
@@ -13,30 +13,38 @@
 
 <script>
 	import amapFile from "../../utils/amap-wx.js"
+	import{mapState,mapMutations} from 'vuex'
 	export default {
 		data() {
 			return {
-				cityName: '南京'
+				
 			}
 		},
+		computed:{
+			...mapState(['locationName'])
+		},
 		methods: {
+			...mapMutations(['update']),
 			toMapPage(){
+				// uni.getLocation({
+				// 	type:'wgs84',
+				// 	success: (res) => {
+				// 		console.log(res)
+				// 	}
+				// })
 				uni.getSetting({
 					success: (res) => {
-						// console.log('222')
-						// console.log(res)
 						//如果没有同意授权,则openSetting
 						if (!res.authSetting['scope.userLocation']) {
 							uni.openSetting({
 								success: (xxx) => {
 									//获取授权位置信息
-									console.log('111')
 									this.getCityName()
 								}
 							})
-							
 						}else{
-							console.log('333')
+							// console.log('333')
+							this.getCityName()
 							uni.navigateTo({
 								url:'/pages/mappage/index'
 							})
@@ -48,11 +56,12 @@
 				var myAmapFun = new amapFile.AMapWX({key:'dd6e74b8b8ebbadcf32a262baa2b441c'});
 				myAmapFun.getRegeo({
 					success:(data)=>{
-						console.log(data)
+						// console.log(data)
 					},
 					fail: (err)=>{
-						console.log(err)
-						this.cityName = '北京'
+						// console.log(err)
+						// this.cityName = '北京'
+						this.update({locationName: '北京'})
 					}
 				})
 			}
@@ -89,7 +98,6 @@
 				width: 100%;
 				height: 56rpx;
 				box-sizing: border-box;
-				
 			}
 			label {
 				// border: 1px solid blue;

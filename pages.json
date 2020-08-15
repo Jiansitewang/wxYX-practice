@@ -17,7 +17,7 @@
 	}, {
 		"path": "pages/mappage/index"
 	}],
-	
+
 	"tabBar": {
 		"color": "#666",
 		"backgroundColor": "#fafafa",
@@ -55,9 +55,9 @@
 		]
 	},
 	"globalStyle": {
-		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#007AFF",
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "网易严选",
+		"navigationBarBackgroundColor": "#fff",
 		"backgroundColor": "#FFFFFF"
 	}
 }
