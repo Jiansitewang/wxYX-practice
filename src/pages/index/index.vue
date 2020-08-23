@@ -8,6 +8,21 @@
 				<input class="searchBar" type="text" placeholder="搜索商品" />
 			</div>
 		</div>
+    <div class="swiper">
+      <swiper class="swiperContainer" indicator-dots="true" autoplay="true" interval="3000" circular="true" duration="500">
+        <block v-for="(item,index) in banner" :key="index">
+          <swiper-item class="swiper-item">
+            <image class="slide-image" :src="item.image_url"></image>
+          </swiper-item>
+        </block>
+      </swiper>
+    </div>
+    <div class="channel">
+      <div v-for="(item,index) in channel" :key="index" @click="navList(item.id)">
+        <img :src="item.icon_url" alt="">
+        <p>{{item.name}}</p>
+      </div>
+    </div>
 	</div>
 
 </template>
@@ -15,24 +30,24 @@
 <script>
 	import amapFile from "../../utils/amap-wx.js"
 	import{mapState,mapMutations} from 'vuex'
+  import {get} from "../../utils/utils.js"
 	export default {
 		data() {
 			return {
-
+        banner:[],
+        channel:[]
 			}
 		},
+    mounted(){
+		  this.getData()
+      this.getCityName()
+    },
 		computed:{
 			...mapState(['locationName'])
 		},
 		methods: {
 			...mapMutations(['update']),
 			toMapPage(){
-				// uni.getLocation({
-				// 	type:'wgs84',
-				// 	success: (res) => {
-				// 		console.log(res)
-				// 	}
-				// })
 				wx.getSetting({
 					success: (res) => {
 						//如果没有同意授权,则openSetting
@@ -65,7 +80,18 @@
 						this.update({locationName: '北京'})
 					}
 				})
-			}
+			},
+      navList(){
+			  wx.navigateTo({
+          url:'/pages/navlist/main?id='+ id
+        })
+      },
+      async getData(){
+        const data = await get ('/index/index')
+        console.log(data)
+        this.banner = data.banner
+        this.channel = data.channel
+      }
 		}
 	}
 </script>
@@ -74,6 +100,7 @@
 	.search {
     display: flex;
 		align-items: center;
+    height: 80rpx;
 		.location {
 			width: 115rpx;
 			// padding-right: 15rpx;
@@ -112,7 +139,34 @@
 
 	}
 
-  .search {
-    height: 80rpx;
+  .swiper {
+    width: 100%;
+    height: 417rpx;
+    //margin-top: 80rpx;
+    .swiperContainer{
+      width: 100%;
+      height: 100%;
+      .swiper-item{
+        width: 100%;
+        height: 100%;
+        .slide-image{
+          width: 100%;
+        }
+      }
+    }
+  }
+  .channel{
+    display: flex;
+    padding: 20rpx 0;
+    background-color: #fff;
+    div{
+      flex:1;
+      text-align: center;
+      img{
+        height: 58rpx;
+        width: 58rpx;
+        display: inline-block;
+      }
+    }
   }
 </style>
