@@ -12,10 +12,12 @@
       <div @click="cancel">取消</div>
     </header>
     <div class="searchTips" v-if="words">
-      <div>
-        tashua
+      <div v-if="tipsData.length !== 0">
+        <div v-for="(item,index) in tipsData" :key="index" >
+          {{item.name}}
+        </div>
       </div>
-      <div class="noGoods">数据库暂无此商品</div>
+      <div class="noGoods" v-else>数据库暂无此商品....</div>
     </div>
     <div class="historyWrapper" v-if="historyData.length !== 0">
       <div class="subWrapper">
@@ -23,7 +25,7 @@
         <div class="clearHistoryButton" @click="clearHistory"></div>
       </div>
       <div class="contWrapper">
-        <div class="hisLabel" v-for="(item,index) in historyData" :key="index">{{item.keyword}}</div>
+        <div class="hisLabel" v-for="(item,index) in historyData" :key="index" @click="searchWords" :data-value="item.keyword">{{item.keyword}}</div>
       </div>
     </div>
     <div class="historyWrapper hotHistory">
@@ -31,7 +33,7 @@
         <div>热门搜索</div>
       </div>
       <div class="contWrapper">
-        <div class="hisLabel" v-for="(item,index) in hotData" :key="index" :class="{active:index === 0}">{{item.keyword}}</div>
+        <div class="hisLabel" v-for="(item,index) in hotData" :key="index" :class="{active:index === 0}" @click="searchWords" :data-value="item.keyword">{{item.keyword}}</div>
 
       </div>
     </div>
@@ -46,7 +48,8 @@ export default {
       words: '',
       openid: '',
       hotData:[],
-      historyData:[]
+      historyData:[],
+      tipsData:[]
     }
   },
   mounted(){
@@ -57,12 +60,24 @@ export default {
     clearInput(){
       this.words = ''
     },
-    inputFocus(){
-
-    },
-    showTips(){},
+    inputFocus(){},
     cancel(){},
-    clearHistory(){},
+    async showTips(){
+      const data = await get('/search/showTips',{
+        keyword: this.words
+      })
+      this.tipsData = data.keywords
+      console.log(data)
+    },
+    async clearHistory(){
+      //以用户id去数据库中查找匹配的历史记录数据
+      const data = await post('/search/clearHistoryAction',{
+        openId:this.openid
+      })
+      if (data){
+        this.historyData = []
+      }
+    },
     async getHotData(){
       const data = await get('/search/indexAction?openId='+ this.openid)
       this.historyData = data.historyData
@@ -71,14 +86,12 @@ export default {
     },
     async searchWords(e){
       //存储搜索历史记录
-      console.log(e,'e')
       let value = e.currentTarget.dataset.value
       this.words = value || this.words
       const data = await post('/search/addHistoryAction',{
         openId:this.openid,
         keyword: value || this.words
       })
-      console.log(data,'data')
       //获取历史记录
       this.getHotData()
     },
@@ -127,6 +140,28 @@ export default {
         text-align: center;
       }
 
+    }
+    .searchTips{
+      position: absolute;
+      width: 100%;
+      top: 91rpx;
+      left: 0;
+      bottom: 0;
+      box-sizing: border-box;
+      padding: 0 32rpx;
+      z-index: 9;
+      background: #ffffff;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      div{
+        div{
+          padding: 20rpx 0;
+        }
+      }
+      .noGoods{
+        margin-top: 300rpx;
+        text-align: center;
+      }
     }
     .historyWrapper{
       background: #fff;
