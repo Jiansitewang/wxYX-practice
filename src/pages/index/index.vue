@@ -3,7 +3,7 @@
 		<div class="search">
 			<navigator open-type="navigate" class="location" url="/pages/mappage" @click="toMapPage">{{locationName}}
       </navigator>
-			<div class="inputWrapper">
+			<div class="inputWrapper" @click="toSearchPage">
 				<label></label>
 				<input class="searchBar" type="text" placeholder="搜索商品" />
 			</div>
@@ -165,6 +165,11 @@
 					}
 				})
 			},
+      toSearchPage(){
+        wx.navigateTo({
+          url:'/pages/search/main'
+        })
+      },
 			getCityName(){
 				var myAmapFun = new amapFile.AMapWX({key:'dd6e74b8b8ebbadcf32a262baa2b441c'});
 				myAmapFun.getRegeo({

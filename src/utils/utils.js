@@ -21,7 +21,6 @@ export function formatTime (date) {
 
 //------请求的封装-------
 const host = "http://localhost:5656/wak"
-
 function request (url,method,data,header={}){
   wx.showLoading({
     title: "加载中"
@@ -29,6 +28,7 @@ function request (url,method,data,header={}){
   return new Promise((resolve,reject)=>{
     wx.request({
       url: host + url,
+      method: method,
       data: data,
       header: {
         "content-type": "application/json"
@@ -48,18 +48,14 @@ function request (url,method,data,header={}){
   })
 }
 
-function get(url,data) {
-  return request(url,'GET',data)
-}
-function post(url,data) {
+function post(url, data) {
   return request(url,'POST',data)
 }
-
+function get(url, data) {
+  return request(url,'GET',data)
+}
 export {host,request,get,post}
 export default {
   formatNumber,
   formatTime, //格式化时间
-  request,
-  get,
-  post
 }
