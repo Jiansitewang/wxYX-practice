@@ -13,7 +13,7 @@
     </header>
     <div class="searchTips" v-if="words">
       <div v-if="tipsData.length !== 0">
-        <div v-for="(item,index) in tipsData" :key="index" >
+        <div v-for="(item,index) in tipsData" :key="index" @click="searchWords" :data-value="item.name">
           {{item.name}}
         </div>
       </div>
@@ -37,6 +37,21 @@
 
       </div>
     </div>
+<!--商品列表-->
+    <div class="goodsList" v-if="goodsList.length !== 0">
+      <div class="sortNav">
+        <div @click="changeTab(0)" :class="[0 === defaultIndex ? 'active' : '']">综合</div>
+        <div @click="changeTab(1)" :class="[1 === defaultIndex ? 'active' : '']" class="price">价格</div>
+        <div @click="changeTab(2)" :class="[2 === defaultIndex ? 'active' : '']">分类</div>
+      </div>
+      <div class="sortList">
+        <div class="item" v-for="(item,index) in goodsList" :key="index">
+          <img :src="item.list_pic_url" alt="">
+          <p class="class">{{item.name}}</p>
+          <p class="price">¥{{item.retail_price}}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,7 +64,10 @@ export default {
       openid: '',
       hotData:[],
       historyData:[],
-      tipsData:[]
+      tipsData:[],
+      order:'',
+      goodsList:[],
+      defaultIndex: 0
     }
   },
   mounted(){
@@ -59,15 +77,23 @@ export default {
   methods:{
     clearInput(){
       this.words = ''
+      this.goodsList = []
     },
-    inputFocus(){},
-    cancel(){},
+    inputFocus(){
+      this.goodsList = []
+      this.showTips()
+    },
+    cancel(){
+      wx.navigateBack({
+        delta: 1
+      })
+    },
     async showTips(){
       const data = await get('/search/showTips',{
         keyword: this.words
       })
       this.tipsData = data.keywords
-      console.log(data)
+      // console.log(data)
     },
     async clearHistory(){
       //以用户id去数据库中查找匹配的历史记录数据
@@ -94,7 +120,25 @@ export default {
       })
       //获取历史记录
       this.getHotData()
+      this.getGoodsData()
     },
+    async getGoodsData(){
+      const data = await get('/search/showTips',{
+        keyword: this.words,
+        order: this.order
+      })
+      this.goodsList = data.keywords
+      this.tipsData = []
+    },
+    changeTab(index){
+      this.defaultIndex = index
+      if (index === 1 ){
+        this.order = this.order === 'asc'?'desc':'asc'
+      }else {
+        this.order = ''
+      }
+      this.getGoodsData()
+    }
   }
 }
 </script>
@@ -130,8 +174,8 @@ export default {
           margin-left: 10rpx;
         }
         .xxx{
-          width: 53 rpx;
-          height: 53 rpx;
+          width: 53rpx;
+          height: 53rpx;
           padding: 0;
         }
       }
@@ -194,6 +238,90 @@ export default {
     }
     .hotHistory{
       margin-top: 20rpx;
+    }
+    .goodsList{
+      position: absolute;
+      width: 100%;
+      top: 91rpx;
+      left: 0;
+      bottom: 0;
+      box-sizing: border-box;
+      padding: 0 32rpx;
+      z-index: 9;
+      background: #ffffff;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      .sortNav{
+        display: flex;
+        width: 100%;
+        height: 78rpx;
+        line-height: 78rpx;
+        background: #fff;
+        border-bottom: 1px solid #d9d9d9;
+        div{
+          width: 250rpx;
+          //height: 100%;
+          text-align: center;
+        }
+        .active{
+          color: #b4282d;
+        }
+        .price {
+          background: url(//yanxuan.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/no-3127092a69.png) 165rpx center no-repeat;
+          background-size: 15rpx 21rpx;
+        }
+        .active.desc {
+          background: url(http://yanxuan.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/down-95e035f3e5.png) 165rpx center no-repeat;
+          background-size: 15rpx 21rpx;
+        }
+        .active.asc {
+          background: url(http://yanxuan.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/up-636b92c0a5.png) 165rpx center no-repeat;
+          background-size: 15rpx 21rpx;
+        }
+      }
+      .sortList{
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        .item{
+          box-sizing: border-box;
+          width:50%;
+          text-align: center;
+          background-color: #fff;
+          padding: 15rpx 0;
+          border-bottom: 1rpx solid #d9d9d9;
+          border-right: 1rpx solid #d9d9d9;
+          img{
+            display:block;
+            width: 302rpx;
+            height: 302rpx;
+            margin: 0 auto;
+          }
+          .name{
+            margin: 15rpx 0 22rpx 0;
+            text-align: center;
+            padding: 0 20rpx;
+            font-size: 24rpx;
+          }
+          .price{
+            text-align: center;
+            font-size: 30rpx;
+            color: #b4282d;
+          }
+        }
+        .item:nth-child(2n){
+          border-right: none;
+        }
+        .item.active:nth-last-child(1){
+          border-bottom: none;
+        }
+        .item.active:nth-last-child(2){
+          border-bottom: none;
+        }
+        .item.none:last-child{
+          border-bottom: none;
+        }
+      }
     }
   }
 </style>
