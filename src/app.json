@@ -1,6 +1,6 @@
 {
   "pages": [
-    "pages/search/main",
+    "pages/goods/main",
     "pages/index/main",
     "pages/topic/main",
     "pages/category/main",
@@ -9,7 +9,8 @@
     "pages/mappage/main",
     "pages/brandlist/main",
     "pages/newgoods/main",
-    "pages/topicdetail/main"
+    "pages/topicdetail/main",
+    "pages/search/main"
   ],
   "window": {
     "backgroundColor": "#f4f3f4",
