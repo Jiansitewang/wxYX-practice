@@ -10,7 +10,8 @@
     "pages/brandlist/main",
     "pages/newgoods/main",
     "pages/topicdetail/main",
-    "pages/search/main"
+    "pages/search/main",
+    "pages/order/main"
   ],
   "window": {
     "backgroundColor": "#f4f3f4",

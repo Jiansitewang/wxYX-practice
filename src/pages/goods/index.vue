@@ -41,6 +41,48 @@
     <div class="goodsDetail" v-if="goodsDesc">
       <wxParse :content="goodsDesc"/>
     </div>
+    <!--常见问题-->
+    <div class="problem">
+      <header class="header">
+        <text class="title">常见问题</text>
+      </header>
+      <div class="questionWrapper">
+        <div class="item" v-for="(item,index) in problemList" :key="index">
+          <div>
+            <text class="spot"></text>
+            <text class="question">{{item.question}}</text>
+          </div>
+          <div class="answer">{{item.answer}}</div>
+        </div>
+      </div>
+    </div>
+    <!--大家都在看-->
+    <div class="problem everyoneLook">
+      <header class="header">
+        <text class="title">大家都在看</text>
+      </header>
+      <div class="itemWrapper">
+        <div class="item" v-for="(item,index) in goodsList" :key="index">
+          <img :src="item.list_pic_url" alt="">
+          <p>{{item.name}}</p>
+          <p>{{item.retail_price}}</p>
+        </div>
+      </div>
+    </div>
+    <!--底部边栏-->
+    <div class="footer">
+        <div class="collectWrapper" @click="goodsCollect">
+          <div :class="[collectState ? 'active' : '']"></div>
+        </div>
+        <div class="cartWrapper">
+          <div class="cartIcon" @click="toCartPage">
+            <span>{{cartNum}}</span>
+            <img src="../../../static/images/ic_menu_shoping_nor.png" alt="">
+          </div>
+        </div>
+        <div @click="buy">立即购买</div>
+        <div @click="addCart">加入购物车</div>
+    </div>
     <!--选择规格弹出层-->
     <div class="maskLayer" v-show="showPop" @click="showSpec"></div>
     <div class="popUp" :class="[showPop ? 'fadeUp' : 'fadeDown']">
@@ -68,7 +110,7 @@
 </template>
 
 <script>
-import {get} from "../../utils/utils"
+import {get,post} from "../../utils/utils"
 import wxParse from 'mpvue-wxparse'
 
 export default {
@@ -82,7 +124,13 @@ export default {
       showPop: false,
       selectNum: 0,
       attribute: [],
-      goodsDesc:''
+      goodsDesc:'',
+      problemList: [],
+      goodsList: [],
+      collectState: false,
+      goodsId: '',
+      cartNum: 0,
+      allPrice: ''
     }
   },
   components:{
@@ -111,6 +159,12 @@ export default {
       this.bannerPic = data.gallery
       this.attribute = data.attribute
       this.goodsDesc = data.info.goods_desc
+      this.problemList = data.problem
+      this.goodsList = data.goodsList
+      this.goodsId = data.info.id
+      this.collectState = data.collected
+      this.cartNum = data.allNumber
+      this.allPrice = data.info.retail_price
     },
     showSpec(){
       this.showPop = !this.showPop
@@ -119,11 +173,54 @@ export default {
       this.selectNum += 1
     },
     minus(){
-      if (this.selectNum > 1){
+      if (this.selectNum > 0){
         this.selectNum -= 1
       }else {
         return false
       }
+    },
+    async goodsCollect(){
+      this.collectState = !this.collectState
+      const data = await post('/collect/addCollect',{
+        openId: this.openid,
+        goodsId: this.goodsId
+      })
+    },
+    toCartPage(){
+      wx.switchTab({
+        url: '/pages/cart/main'
+      })
+    },
+    async buy(){
+      if (this.showPop){
+        if(this.selectNum === 0){
+          wx.showToast({
+            title: '请选择商品数量',
+            duration: 2000,
+            icon: 'none',
+            mask: true,
+            success: res =>{
+
+            }
+          })
+          return false
+        }
+        const data = await post('/order/submitAction',{
+          goodsId: this.goodsId,
+          openId: this.openid,
+          allPrice: this.allPrice
+        })
+        if (data){
+          wx.navigateTo({
+            url: "/pages/order/main"
+          })
+        }
+      }else {
+        this.showPop = true
+      }
+    },
+    addCart(){
+
     }
   }
 }
@@ -336,6 +433,173 @@ export default {
         white-space: nowrap;
       }
     }
+  }
+  .problem{
+    margin-bottom: 110rpx;
+    .header{
+      padding: 35rpx 0;
+      background: #fff;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .title{
+        padding: 0 25rpx;
+        background: #FFFFFF;
+      }
+    }
+    .questionWrapper{
+      padding: 0 30rpx;
+      background: #FFFFFF;
+      .item{
+        padding-bottom: 25rpx;
+        div:nth-child(1){
+          display: flex;
+          .spot{
+            width: 8rpx;
+            height: 8rpx;
+            background: #b4282d;
+            border-radius: 50%;
+            margin-top: 11rpx;
+          }
+          .question{
+            line-height: 30rpx;
+            padding-left: 8rpx;
+            display: block;
+            font-size: 26rpx;
+            padding-bottom: 15rpx;
+            color: #303030;
+          }
+        }
+        .answer{
+          line-height: 40rpx;
+          padding-left: 16rpx;
+          font-size: 26rpx;
+          color: #787878;
+        }
+      }
+    }
+  }
+  .everyoneLook{
+    .itemWrapper{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      width: 730rpx;
+      margin: 0 auto;
+      .item{
+        width: 360rpx;
+        background: #fff;
+        margin-bottom: 10rpx;
+        padding-bottom: 10rpx;
+        img{
+          display: block;
+          width: 302rpx;
+          height: 302rpx;
+          margin: 0 auto;
+        }
+        p{
+          margin-bottom: 5rxp;
+          text-indent: 1em;
+        }
+        p:nth-child(2){
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 98%;
+        }
+        p:nth-child(3){
+          color: #b4282d;
+        }
+      }
+    }
+  }
+  .footer{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 750rpx;
+    height: 100rpx;
+    display: flex;
+    background: #FFFFFF;
+    z-index: 10;
+    .collectWrapper{
+      height: 100rpx;
+      width: 162rpx;
+      border: 1px solid #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      div{
+        display: block;
+        height: 44rpx;
+        width: 44rpx;
+        background: url("../../../static/images/icon_collect.png") no-repeat;
+        background-size: 100% 100%;
+      }
+      .active{
+        display: block;
+        height: 44rpx;
+        width: 44rpx;
+        background: url("../../../static/images/icon_collect_checked.png") no-repeat;
+        background-size: 100% 100%;
+      }
+    }
+    .cartWrapper{
+      height: 100rpx;
+      width: 162rpx;
+      border: 1px solid #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .cartIcon{
+        position: relative;
+        width: 60rpx;
+        height: 60rpx;
+        span{
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 28rpx;
+          height: 28rpx;
+          z-index: 10;
+          background: #b4282d;
+          text-align: center;
+          font-size: 18rpx;
+          color: #fff;
+          line-height: 28rpx;
+          border-radius: 50%;
+        }
+        img{
+          display: flex;
+          height: 44rpx;
+          width: 44rpx;
+          position: absolute;
+          top: 10rpx;
+          left: 0;
+        }
+      }
+    }
+    div:nth-child(3){
+      height: 100rpx;
+      line-height: 96rpx;
+      flex: 1;
+      text-align: center;
+      color: #333333;
+      border-top: 1rpx solid #f4f4f4;
+      border-bottom: 1rpx solid #f4f4f4;
+    }
+    div:nth-child(4){
+      height: 100rpx;
+      line-height: 96rpx;
+      flex: 1;
+      text-align: center;
+      color: #FFFFFF;
+      border: 1rpx solid #b4282d;
+      background: #b4282d;
+    }
+
   }
 }
 </style>
