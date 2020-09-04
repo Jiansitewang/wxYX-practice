@@ -45,7 +45,7 @@
         <div @click="changeTab(2)" :class="[2 === defaultIndex ? 'active' : '']">分类</div>
       </div>
       <div class="sortList">
-        <div class="item" v-for="(item,index) in goodsList" :key="index" @click="goodsDetail(item,id)">
+        <div class="item" v-for="(item,index) in goodsList" :key="index" @click="toGoodsDetail(item.id)">
           <img :src="item.list_pic_url" alt="">
           <p class="class">{{item.name}}</p>
           <p class="price">¥{{item.retail_price}}</p>
@@ -139,9 +139,9 @@ export default {
       }
       this.getGoodsData()
     },
-    goodsDetail(id){
+    toGoodsDetail(id){
       wx.navigateTo({
-        url: '/pages/goods/main?'+ id
+        url: '/pages/goods/main?id='+ id
       })
     }
   }
