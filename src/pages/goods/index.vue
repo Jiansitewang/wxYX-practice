@@ -62,7 +62,7 @@
         <text class="title">大家都在看</text>
       </header>
       <div class="itemWrapper">
-        <div class="item" v-for="(item,index) in goodsList" :key="index">
+        <div class="item" v-for="(item,index) in goodsList" :key="index" @click="toGoodsDetail(item.id)">
           <img :src="item.list_pic_url" alt="">
           <p>{{item.name}}</p>
           <p>{{item.retail_price}}</p>
@@ -143,6 +143,22 @@ export default {
       path: '/pages/goods/main?id'+ this.info.id,
       imageUrl: this.bannerPic[0].img_url
     }
+  },
+  onLoad(){
+    //从一个商品点击另一个商品链接时,清除原商品数据
+    this.bannerPic = []
+    this.attribute = []
+    this.goodsDesc = ''
+    this.info = {}
+    this.brand = {}
+  },
+  onUnload(){
+    //从微信原生返回上一页按钮时,清空原商品数据
+    this.bannerPic = []
+    this.attribute = []
+    this.goodsDesc = ''
+    this.info = {}
+    this.brand = {}
   },
   mounted () {
     this.openid = wx.getStorageSync('openId')
@@ -247,6 +263,11 @@ export default {
       }else {
         this.showPop = true
       }
+    },
+    toGoodsDetail(id){
+      wx.navigateTo({
+        url: '/pages/goods/main?id=' + id
+      })
     }
   }
 }

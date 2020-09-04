@@ -1,5 +1,6 @@
 <template>
 	<div class="index">
+    <!--头部搜索-->
 		<div class="search">
 			<navigator open-type="navigate" class="location" url="/pages/mappage" @click="toMapPage">{{locationName}}
       </navigator>
@@ -8,6 +9,7 @@
 				<input class="searchBar" type="text" placeholder="搜索商品" />
 			</div>
 		</div>
+    <!--轮播图-->
     <div class="swiper">
       <swiper class="swiperContainer" indicator-dots="true" autoplay="true" interval="3000" circular="true" duration="500">
         <block v-for="(item,index) in banner" :key="index">
@@ -17,12 +19,14 @@
         </block>
       </swiper>
     </div>
+    <!--购物频道-->
     <div class="channel">
       <div v-for="(item,index) in channel" :key="index" @click="navList(item.id)">
         <img :src="item.icon_url" alt="">
         <p>{{item.name}}</p>
       </div>
     </div>
+    <!--品牌直供-->
     <div class="brand">
       <header @click="toBrandList">品牌制造商直供</header>
       <div class="content">
@@ -35,6 +39,7 @@
         </div>
       </div>
     </div>
+    <!--新品首发-->
     <div class="newgoods">
       <div class="newgoods-top" @click="toGoodsList('new')">
         <div class="top">
@@ -55,6 +60,7 @@
         </ul>
       </div>
     </div>
+    <!--人气推荐-->
     <div class="newgoods hotgoods">
       <div class="newgoods-top" @click="toGoodsList('hot')">
         <div class="top">
@@ -75,6 +81,7 @@
         </ul>
       </div>
     </div>
+    <!--专题精选-->
     <div class="topicList">
       <div class="topicList-top">
         专题精选
@@ -99,6 +106,7 @@
         </ul>
       </div>
     </div>
+    <!--商品分类展示-->
     <div class="goodstuff">
       <div class="list" v-for="(item,index) in newCategoryList" :key="index">
         <header class="header">{{item.name}}好物</header>
